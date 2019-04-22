@@ -1,5 +1,25 @@
 fn main() {
-    println!("Hello, world!");
+    let add = |x,h|{
+        let mut n = ListNode::new(x);
+        n.next = h; 
+        return Some(Box::new(n));
+    };
+    
+    let mut h = None;
+    
+    h = add(5,h);
+    h = add(4,h);
+    h = add(3,h);
+    h = add(2,h);
+    h = add(1,h);
+
+    let mut nh = h;
+    for i in 1..10{
+        println!("\n\nrotate {}",i);
+        Solution::show_list(&nh);
+        nh = Solution::rotate_right(nh,i);
+        Solution::show_list(&nh);
+    }
 }
 
 #[derive(PartialEq,Eq,Debug,Clone)]
@@ -21,8 +41,23 @@ impl ListNode{
 struct Solution;
 
 impl Solution {
-    pub fn rotate_right(head: Option<Box<ListNode>>, k: i32) -> Option<Box<ListNode>> {
+    pub fn show_list(list : &Option<Box<ListNode>>){
         
+        let mut cur = list;
+        let mut node;
+        
+        while cur.is_some(){
+            node = cur.as_ref().unwrap();
+            print!("{} ->",node.val);
+            cur = &node.next;
+        }
+        println!("");
+    }
+    
+    pub fn rotate_right(head: Option<Box<ListNode>>, k: i32) -> Option<Box<ListNode>> {
+    
+        // 1 Get List Length
+        let mut head = head;
         let mut len = 0;
         let mut cur = &head;
         while cur.is_some(){
@@ -30,21 +65,32 @@ impl Solution {
             cur = &cur.as_ref().unwrap().next;
         }
 
-        k = k % len;
-
-        if k == 0{
+        if len <= 1{
             return head;
         }
-        
+
+        let k = k % len;
+        if k <= 0{
+            return head;
+        }
+
+        //2 Get new head node
         let mut rest = len;
         let mut cur = &mut head;
         while cur.is_some() && rest != k{
             rest -= 1;
-            cur = &cur.as_ref().unwrap().next;
+            cur = &mut cur.as_mut().unwrap().next;
         }
 
+        let mut newhead = cur.take();
+        
+        // 3 New tail -> old head
+        let mut cur = &mut newhead;
+        while cur.is_some(){
+            cur = &mut cur.as_mut().unwrap().next;
+        }
+        *cur = head.take();
 
-        None
-
+        newhead
     }
 }
