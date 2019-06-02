@@ -4,8 +4,7 @@ use std::rc::Rc;
 fn main() {
 	let mut head = TreeNode::new(1);
 	let mut left = TreeNode::new(2);
-	head.left = Solution::item_from_node(left);
-	/*
+	
 	left.left = Solution::item_from_val(3);
 	left.right = Solution::item_from_val(4);
 	head.left = Solution::item_from_node(left);
@@ -13,7 +12,6 @@ fn main() {
 	let mut r = TreeNode::new(5);
 	r.right = Solution::item_from_val(6);
 	head.right = Solution::item_from_node(r);
-	*/
 
 	let mut head = Solution::item_from_node(head);
 	Solution::traverse(&head);
@@ -44,6 +42,11 @@ impl TreeNode {
 struct Solution;
 
 impl Solution {
+
+	pub fn item_from_val(v:i32) -> Option<Rc<RefCell<TreeNode>>> {
+		Solution::item_from_node(TreeNode::new(v))
+	}
+
 	pub fn item_from_node(n: TreeNode) -> Option<Rc<RefCell<TreeNode>>> {
 		Some(Rc::new(RefCell::new(n)))
 	}
@@ -63,10 +66,10 @@ impl Solution {
 		fn expand(tree: &mut Option<Rc<RefCell<TreeNode>>>) {
 			if tree.is_none() { return; }
 
-			let root = tree.as_ref().unwrap().clone();
-			let root = root.as_ref();
-			let mut left = root.borrow_mut().left.take();
-			let mut right = root.borrow_mut().right.take();
+			let tree = tree.as_ref().unwrap().clone();
+			let tree = tree.as_ref();
+			let mut left = tree.borrow_mut().left.take();
+			let mut right = tree.borrow_mut().right.take();
 
 			expand(&mut right);
 			expand(&mut left);
@@ -81,11 +84,11 @@ impl Solution {
 					c = refnode.borrow().right.is_some();
 				}
 				refnode.borrow_mut().right.replace(right.unwrap());
-				root.borrow_mut().right.replace(left.unwrap());
+				tree.borrow_mut().right.replace(left.unwrap());
 			} else if right.is_some() {
-				root.borrow_mut().right.replace(right.unwrap());
+				tree.borrow_mut().right.replace(right.unwrap());
 			} else if left.is_some() {
-				root.borrow_mut().right.replace(left.unwrap());
+				tree.borrow_mut().right.replace(left.unwrap());
 			}
 		}
 	}
